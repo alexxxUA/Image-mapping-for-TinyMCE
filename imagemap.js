@@ -15,11 +15,18 @@
             svgElementsClass = 'areaElement',
             svgDragElementClass = 'areaDrag',
             drawType = 'rect',
-            popupMinWidth = 690;
+            popupMinWidth = 690,
+            editMappingDom = tinyMCEPopup.execCommand('mceImagemapEditDom'),
+            editMapName = '';
 
+        //Check for support SVG elements
         if(!document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")){
             $('#errorSVG').show();
             $('#imageMapBody form').hide();
+        }
+        //Load editable image
+        if(editMappingDom){
+            editMapping();
         }
         document.getElementById('srcbrowsercontainer').innerHTML = getBrowserHTML('srcbrowser','imgUrl','image','theme_advanced_image');
 
@@ -497,7 +504,100 @@
                 $('body, html').css('cursor', 'default');
                 urlBox.addClass(imgUrlError);
                 return false;
-            }).attr({'src':imgUrl, 'usemap': '#previewMap'});
+            }).attr({'src':imgUrl});
+        }
+        function editMapping(){
+            $('#map-area-wrapper').append('<div id="tempEditMap" style="display:none;">'+editMappingDom+'</div>');
+            console.log(editMappingDom);
+            var $tempImg = $('#tempEditMap img');
+            imgUrl = $tempImg.attr('src');
+            console.log(imgUrl);
+            editMapName = $tempImg.attr('usemap');
+            console.log('Yep');
+            $('.map-area-wrapper #mappedImg').load(function(){
+                console.log('start load');
+                var imgAlt = $tempImg.attr('alt');
+                $('#imgAlt').val($tempImg.attr('alt'));
+                $('#imgTitle').val($tempImg.attr('title'));
+                $('#mapName').val($('#tempEditMap map').attr('name'));
+                $('#imgUrl').val(imgUrl);
+
+                $('.choseImage').css('display', 'none');
+                $('.imageMapping').css('display', 'block');
+
+                imgWidth = $('.map-area-wrapper img').width();
+                imgHeight = $('.map-area-wrapper img').height();
+                $('.map-area').attr({'width': imgWidth, 'height': imgHeight});
+                $('.map-area-wrapper').width(imgWidth).height(imgHeight);
+                var bodyHeight = $('#imageMapBody').height();
+                imgWidth<popupMinWidth ? popopW = popupMinWidth : popopW = imgWidth;
+
+                resize(popopW+80, bodyHeight+10);
+                $(window).trigger('resize');
+                parentPosition = svgObj.offset();
+                $('[data-draw-type='+drawType+']').addClass('activeType');
+                $('#insert').show();
+                $('body, html').css('cursor', 'default');
+
+                //Load all mapped elements
+                $('#tempEditMap area').each(function(i){
+                    var $this = $(this),
+                        shape = $this.attr('shape'),
+                        coords = $this.attr('coords'),
+                        alt = checkForUndefined($this.attr('alt'), alt),
+                        title = checkForUndefined($this.attr('title'), title),
+                        href = checkForUndefined($this.attr('href'), href);
+                    mapElement = i;
+                    if(shape == 'poly'){
+                        svgPolyCoords = coords.split(', ').join(' ');
+                        svgObj.append(makeSVG('polygon',{
+                            'points' : svgPolyCoords,
+                            'id' : 'element'+mapElement,
+                            'class' : svgElementsClass,
+                            'data-shape' : shape,
+                            'data-coords' : coords,
+                            'data-href' : href,
+                            'data-alt' : alt,
+                            'data-title' : title
+                        }));
+                    }
+                    else if(shape == 'circle'){
+                        svgCircleCoords = coords.split(',');
+                        svgObj.append(makeSVG('circle',{
+                            'cx' : svgCircleCoords[0],
+                            'cy' : svgCircleCoords[1],
+                            'r' : svgCircleCoords[2],
+                            'id' : 'element'+mapElement,
+                            'class' : svgElementsClass,
+                            'data-shape' : shape,
+                            'data-coords' : coords,
+                            'data-href' : href,
+                            'data-alt' : alt,
+                            'data-title' : title
+                        }));
+                    }
+                    else if(shape == 'rect'){
+                        svgRectCoords = coords.split(',');
+                        svgObj.append(makeSVG('rect',{
+                            'x' : svgRectCoords[0],
+                            'y' : svgRectCoords[1],
+                            'width' : +svgRectCoords[2] - (+svgRectCoords[0]),
+                            'height' : +svgRectCoords[3] - (+svgRectCoords[1]),
+                            'id' : 'element'+mapElement,
+                            'class' : svgElementsClass,
+                            'data-shape' : shape,
+                            'data-coords' : coords,
+                            'data-href' : href,
+                            'data-alt' : alt,
+                            'data-title' : title
+                        }));
+                    }
+                });
+                mapElement++;
+                $('#tempEditMap').remove();
+            }).error(function(){
+                console.log('error');
+            }).attr({'src':imgUrl});
         }
         function clearSVG(){
             $('.'+svgElementsClass).remove();
@@ -508,7 +608,10 @@
             tinyMCEPopup.close();
         }
         $('#insert').live('click', function(){
-            insertMappedImage();
+            if(editMapName){
+                tinyMCEPopup.editor.execCommand('removeEditImageMap');
+            }
+            insertMappedImage();          
         })
         $('#clearSVG').live('click', function(e){
             openPopup(e, confirmMessage, $(this));

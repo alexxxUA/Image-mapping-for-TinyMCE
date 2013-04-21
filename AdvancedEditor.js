@@ -8,29 +8,8 @@
 						setEditorEnabled(config);
 						setActiveControl("setadvanced",config.id);
 					},300);
-				});
-				ed.onContextMenu.add(function(ed, e) {
-
-					if (!e.ctrlKey) {
-
-					    // Restore the last selection since it was removed
-					    if (lastRng)
-					        ed.selection.setRng(lastRng);
-
-					    var menu = this._getMenu(ed);
-
-					    if ((typeof menu).toLowerCase() == 'object')
-					    {
-					        menu.showMenu(e.clientX, e.clientY);
-
-					        Event.add(ed.getDoc(), 'click', function(e) {
-					            hide(ed, e);
-					        });
-					        Event.cancel(e);
-					    }
-					}
-
-				});
+				});			
+				
           		setupDialogModeHandler(config.id, ed);
 				setupSubmitIfDirty(ed);
       		},
