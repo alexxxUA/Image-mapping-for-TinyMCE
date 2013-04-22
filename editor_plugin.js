@@ -27,24 +27,30 @@ usemap;
                 return imageMamDom;
             });
             ed.addCommand('removeEditImageMap', function() {
-                tinyMCE.activeEditor.dom.select('[usemap="#'+usemap+'"]' )[0].remove();
+                console.log(usemap);
+                console.log(tinyMCE.activeEditor.dom.select('[usemap="#'+usemap+'"]' )[0]);
+                tinyMCE.activeEditor.dom.select('[usemap="#'+usemap+'"]' )[0].remove;
                 tinyMCE.activeEditor.dom.select('[name="'+usemap+'"]' )[0].remove;
             });
             ed.onContextMenu.add(function(ed, e) {
                 var img;
                 if(e.target.nodeName == 'AREA'){
                     usemap = e.target.parentNode.getAttribute('name');
-                    img = tinyMCE.activeEditor.dom.select('[usemap="#'+usemap+'"]' )[0].outerHTML
                 }
                 else if(e.target.getAttribute('usemap')){
-                    img = e.target.outerHTML;
                     usemap = e.target.getAttribute('usemap');
                     usemap = usemap.slice(1, usemap.length);
                 }
                 if(usemap){
-                    var map = tinyMCE.activeEditor.dom.select('[name="'+usemap+'"]' )[0].outerHTML;
-                    imageMamDom = img+''+map;
-                    console.log(imageMamDom);                                      
+                    var $img = tinyMCE.activeEditor.dom.select('[usemap="#'+usemap+'"]' )[0];
+                    imageMamDom = {
+                        imgMapName : usemap,
+                        imgUrl : $img.getAttribute('src'),
+                        imgAlt : $img.getAttribute('alt'),
+                        imgTitle : $img.getAttribute('title'),
+                        mapDom : tinyMCE.activeEditor.dom.select('[name="'+usemap+'"]' )[0].innerHTML
+                    };
+                    //console.log(imageMamDom);
                 }
                 else{
                     imageMamDom = false;

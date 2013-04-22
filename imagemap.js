@@ -480,53 +480,53 @@
             imgUrl = urlBox.val();
             urlBox.removeClass(imgUrlError);
             $("body, html").css("cursor", "progress");
-            $('.map-area-wrapper img').load(function(){
-                var imgAlt = imgUrl.split('/');
-                imgAlt = imgAlt[imgAlt.length-1].split('.');
-                imgAlt = imgAlt[0];
-                $('#imgAlt, #imgTitle, #mapName').val(imgAlt);
-                $('.choseImage').css('display', 'none');
-                $('.imageMapping').css('display', 'block');
-                imgWidth = $('.map-area-wrapper img').width();
-                imgHeight = $('.map-area-wrapper img').height();
-                $('.map-area').attr({'width': imgWidth, 'height': imgHeight});
-                $('.map-area-wrapper').width(imgWidth).height(imgHeight);
-                var bodyHeight = $('#imageMapBody').height();
-                imgWidth<popupMinWidth ? popopW = popupMinWidth : popopW = imgWidth;
+            $('#imgAlt, #imgTitle, #mapName').val(' ');
+            $('.map-area-wrapper').width(0).height(0);
+            $('.map-area-wrapper img').attr('src',imgUrl).imagesLoaded({
+                done: function(){
+                    var imgAlt = imgUrl.split('/');
+                    imgAlt = imgAlt[imgAlt.length-1].split('.');
+                    imgAlt = imgAlt[0];
+                    $('#imgAlt, #imgTitle, #mapName').val(imgAlt);
+                    $('.choseImage').css('display', 'none');
+                    $('.imageMapping').css('display', 'block');
+                    imgWidth = $('.map-area-wrapper img').width();
+                    imgHeight = $('.map-area-wrapper img').height();
+                    $('.map-area').attr({'width': imgWidth, 'height': imgHeight});
+                    $('.map-area-wrapper').width(imgWidth).height(imgHeight);
+                    var bodyHeight = $('#imageMapBody').height();
+                    imgWidth<popupMinWidth ? popopW = popupMinWidth : popopW = imgWidth;
 
-                resize(popopW+80, bodyHeight+10);
-                $(window).trigger('resize');
-                parentPosition = svgObj.offset();
-                $('[data-draw-type='+drawType+']').addClass('activeType');
-                $('#insert').show();
-                $('body, html').css('cursor', 'default');
-            }).error(function(){
-                $('body, html').css('cursor', 'default');
-                urlBox.addClass(imgUrlError);
-                return false;
-            }).attr({'src':imgUrl});
+                    resize(popopW+80, bodyHeight+10);
+                    $(window).trigger('resize');
+                    parentPosition = svgObj.offset();
+                    $('[data-draw-type='+drawType+']').addClass('activeType');
+                    $('#insert').show();
+                    $('body, html').css('cursor', 'default');
+                },
+                fail : function(){
+                    $('body, html').css('cursor', 'default');
+                    urlBox.addClass(imgUrlError);
+                    return false;
+                }
+            });
         }
         function editMapping(){
-            $('#map-area-wrapper').append('<div id="tempEditMap" style="display:none;">'+editMappingDom+'</div>');
-            console.log(editMappingDom);
+            $('#map-area-wrapper').append('<div id="tempEditMap" style="display:none;">'+editMappingDom.mapDom+'</div>');
             var $tempImg = $('#tempEditMap img');
-            imgUrl = $tempImg.attr('src');
-            console.log(imgUrl);
+            imgUrl = editMappingDom.imgUrl;
             editMapName = $tempImg.attr('usemap');
-            console.log('Yep');
-            $('.map-area-wrapper #mappedImg').load(function(){
-                console.log('start load');
-                var imgAlt = $tempImg.attr('alt');
-                $('#imgAlt').val($tempImg.attr('alt'));
-                $('#imgTitle').val($tempImg.attr('title'));
-                $('#mapName').val($('#tempEditMap map').attr('name'));
+            $('.map-area-wrapper > img').attr('src', imgUrl).imagesLoaded(function(){
+                $('#imgAlt').val(editMappingDom.imgAlt);
+                $('#imgTitle').val(editMappingDom.imgTitle);
+                $('#mapName').val(editMappingDom.imgMapName);
                 $('#imgUrl').val(imgUrl);
 
                 $('.choseImage').css('display', 'none');
                 $('.imageMapping').css('display', 'block');
 
-                imgWidth = $('.map-area-wrapper img').width();
-                imgHeight = $('.map-area-wrapper img').height();
+                imgWidth = $('.map-area-wrapper > img').width();
+                imgHeight = $('.map-area-wrapper > img').height();
                 $('.map-area').attr({'width': imgWidth, 'height': imgHeight});
                 $('.map-area-wrapper').width(imgWidth).height(imgHeight);
                 var bodyHeight = $('#imageMapBody').height();
@@ -595,9 +595,7 @@
                 });
                 mapElement++;
                 $('#tempEditMap').remove();
-            }).error(function(){
-                console.log('error');
-            }).attr({'src':imgUrl});
+            });
         }
         function clearSVG(){
             $('.'+svgElementsClass).remove();
@@ -611,7 +609,7 @@
             if(editMapName){
                 tinyMCEPopup.editor.execCommand('removeEditImageMap');
             }
-            insertMappedImage();          
+            insertMappedImage();
         })
         $('#clearSVG').live('click', function(e){
             openPopup(e, confirmMessage, $(this));
