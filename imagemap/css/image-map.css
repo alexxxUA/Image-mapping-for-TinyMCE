@@ -168,6 +168,9 @@
 #mapName{
     width: 300px
 }
+.load-image-error{
+    border-color: red;
+}
 #mapName{
     margin: 0 0 0 10px;
 }

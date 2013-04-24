@@ -3,6 +3,7 @@
 <head>
     <title>{#imagemap_dlg.dialog_title}</title>
     <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/jquery.imagesloaded.min.js"></script>
     <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
     <script type="text/javascript" src="../../utils/form_utils.js"></script>
     <script type="text/javascript" src="js/imagemap.js"></script>
@@ -22,7 +23,7 @@
                             <td colspan="2"><table role="presentation" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td>
-                                        <input name="src" type="text" id="imgUrl" class="mceFocus" onchange="window.loadImage('imgUrl');" aria-required="true" />
+                                        <input  type="text" id="imgUrl" onchange="window.loadImage('imgUrl');" aria-required="true" />
                                     </td>
                                     <td id="srcbrowsercontainer">&nbsp;</td>
                                 </tr>
@@ -52,7 +53,7 @@
                             </ul>
                         </div>
                         <div id= "map-area-wrapper" class="map-area-wrapper" style="">
-                            <img style="display: block;" src="">
+                            <img style="display: block;" src="" usemap="#previewMap">
                             <svg class="map-area"></svg>
                         </div>
                         <div class="centeredBox">
