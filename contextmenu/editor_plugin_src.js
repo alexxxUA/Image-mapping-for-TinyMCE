@@ -50,8 +50,13 @@
 				Event.cancel(e);
 
 				// Select the image if it's clicked. WebKit would other wise expand the selection
-				if (e.target.nodeName == 'IMG' || e.target.nodeName == "AREA")
+				if (e.target.nodeName == 'IMG')
 					ed.selection.select(e.target);
+				//Select the img which refers to selected area
+				if (e.target.nodeName == 'AREA'){
+					var usemap = e.target.parentNode.getAttribute('name');
+					ed.selection.select(tinyMCE.activeEditor.dom.select('[usemap="#'+usemap+'"]')[0]);
+				}
 
 				t._getMenu(ed, e).showMenu(e.clientX || e.pageX, e.clientY || e.pageY);
 				Event.add(ed.getDoc(), 'click', function(e) {
