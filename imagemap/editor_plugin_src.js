@@ -66,8 +66,6 @@ usemap;
             return {
                 longname : 'Imagemap plugin',
                 author : 'Alexey Vasin',
-                //authorurl : 'http://tinymce.moxiecode.com',
-                //infourl : 'http://wiki.moxiecode.com/index.php/TinyMCE:Plugins/imagemap',
                 version : "1.0"
             };
         }
